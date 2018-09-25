@@ -18,4 +18,5 @@ O script faz duas comparações, caso as duas condições forem verdadeiras, o h
 
 Condições para desligamento
 TIME for inferior a 30 Minutos.
+
 ACIN for inferior a 50 Volts.
