@@ -1,13 +1,23 @@
 #!/bin/bash
-NBRK="172.16.10.20"
-COMM="public"
-ACIN=$(snmpget -v2c -c $COMM $NBRK 1.3.6.1.4.1.318.1.1.1.3.2.1.0 | awk '{ print $4 }') # OID referente a tensão AC na entrada
-TIME=$(snmpget -v2c -c $COMM $NBRK 1.3.6.1.4.1.318.1.1.1.2.2.3.0 | tr -d "()" | awk '{ print $4 }') # OID referente ao tempo restante em modo de bateria
-if [ $ACIN -le 50 ]  && [ $TIME  -le 180000 ] 
+NOBREAKIP="172.16.10.20"                                #Endereço IP do Nobreak
+COMMUNITY="public"                                      #Community SNMP do Nobreak
+ACIN_OID="1.3.6.1.4.1.318.1.1.1.3.2.1.0"                #OID - AC na entrada
+TIME_OID="1.3.6.1.4.1.318.1.1.1.2.2.3.0"                #OID - Tempo estimado em modo de Bateria
+ACIN_LOW=70                                             #(Volt) Valor mínimo aceitável na entrada AC - Ver datasheet
+TIME_LOW=180000                                         #(Segundos) Valor mínimo aceitável do tempo restante em modo de bateria (Considerar o tempo para desligamento)
+
+#INICIO
+ACIN_READ=$(snmpget -v2c -c $COMMUNITY $NOBREAKIP $ACIN_OID | awk '{ print $4 }')               #Valor lido no SNMP
+TIME_READ=$(snmpget -v2c -c $COMMUNITY $NOBREAKIP $TIME_OID | tr -d "()" | awk '{ print $4 }')  #Valor lido no SNMP
+
+if [ -n "$ACIN_READ" ] && [ -n "$TIME_READ" ]                                   #Verifica se as variáveis são nulas 
 then
-	shutdown -h now
+        if [ $ACIN_READ -le $ACIN_LOW ]  && [ $TIME_READ -le $TIME_LOW ]        #Compara a leitura SNMP com os valores mínimos
+        then
+                echo "Iniciando desligamento por falta de energia" | wall
+                shutdown -h +5
+        fi
+else
+        echo "Erro de leitura SNMP"
 fi
-unset ACIN
-unset TIME
-unset NBRK
-unset COMM
+#FIM
