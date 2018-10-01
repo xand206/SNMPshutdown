@@ -27,24 +27,21 @@ Esse script monitora o Nobreak via SNMP, caso o valor da AC lido via SNMP esteja
 ### Definindo as variáveis:  
 
 + ACIN_LOW:  
-Valor obtido no datasheet do Nobreak. O SMX3000LV informa que o menor valor aceitável na entrada AC é 70 volts  
++ + Valor obtido no datasheet do Nobreak. O SMX3000LV informa que o menor valor aceitável na entrada AC é 70 volts  
++ + SMX3000LV - ACIN_LOW=70  
 
-SMX3000LV - ACIN_LOW=70  
++ TIME_LOW:  
++ + TIME_LOW = [ TEMPO_DESLIGAMENTO x FS x 6000 ]  
++ + + TEMPO_DESLIGAMENTO = Tempo em que o servidor ou VM leva para desligar. (Em minutos)  
++ + + FS = Fator de segurança, precisa ser igual ou maior que 1.1 (FS => 1.1)  
++ + + 6000 = Conversão do tempo para centisegundo  
 
-TIME_LOW:  
-TIME_LOW = [ TEMPO_DESLIGAMENTO x FS x 6000 ]  
-
-+ TEMPO_DESLIGAMENTO = Tempo em que o servidor ou VM leva para desligar. (Em minutos)  
-+ FS = Fator de segurança, precisa ser igual ou maior que 1.1 (FS => 1.1)  
-+ 6000 = Conversão do tempo para centisegundo  
-
-
-
-Exemplo de TIME_LOW:  
++ Exemplo de TIME_LOW:  
 Considerando que o tempo médio para desligamento do servidor seja de 10 minutos com um fator de segurança de 20%:  
+```
 TIME_LOW = [ 10 x 1.2 x 6000 ]  
 TIME_LOW = 72000 centisegundos
-
+```
 
 Exemplo de configuração no CRON para execução a cada 5 minutos  
 ` */5 * * * * usuario /opt/SNMPshutdown/SNMPshutdown.sh `
