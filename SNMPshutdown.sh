@@ -4,7 +4,7 @@ COMMUNITY="public"                                      #Community SNMP do Nobre
 ACIN_OID="1.3.6.1.4.1.318.1.1.1.3.2.1.0"                #OID - AC na entrada
 TIME_OID="1.3.6.1.4.1.318.1.1.1.2.2.3.0"                #OID - Tempo estimado em modo de Bateria
 ACIN_LOW=70                                             #(Volt) Valor mínimo aceitável na entrada AC - Ver datasheet
-TIME_LOW=180000                                         #(Segundos) Valor mínimo aceitável do tempo restante em modo de bateria (Considerar o tempo para desligamento)
+TIME_LOW=180000                                         #(Centisegundo) Valor mínimo aceitável do tempo restante em modo de bateria
 
 #INICIO
 ACIN_READ=$(snmpget -v2c -c $COMMUNITY $NOBREAKIP $ACIN_OID | awk '{ print $4 }')               #Valor lido no SNMP

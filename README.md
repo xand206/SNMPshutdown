@@ -1,29 +1,62 @@
 # SNMPshutdown
 
-Esse script monitora via SNMP o nível de tensão na entrada do Nobreak e o tempo estimado do módulo de bateria.
+Esse script foi desenvolvido para ser utilizado no Nobreak APC SMX3000LV com placa AP9630. A execução do script pode ser feita pelo CRON.
 
 
-Nobreak testado APC SMX3000LV + AP9630
+Pacote necessário CENTOS7:
+
+net-snmp-utils
 
 
+Lógica de funcionamento:
 
-O script pode ser configurado para executar no CRON com o intervalo de tempo desejado.
-
-NBRK - Endereço IP da placa de gerência do Nobreak.
-
-COMM - Community SNMP.
-
-ACIN - Consulta SNMP referente a tensão de entrada no Nobreak.
-
-TIME - Consulta SNMP referente ao tempo de operação estimado do banco de baterias.
+Esse script monitora o Nobreak via SNMP, caso o valor da AC lido via SNMP esteja abaixo do mínimo especificado e o tempo estimado de operação em modo de bateria lido via SNMP esteja abaixo do valor mínimo especificado, o servidor será desligado.
 
 
+Variáveis que precisam ser ajustadas
+
+NOBREAKIP		#Endereço IP do Nobreak
+
+COMMUNITY		#Community SNMP do Nobreak
+
+ACIN_OID		#OID - AC na entrada
+
+TIME_OID		#OID - Tempo estimado em modo de Bateria
+
+ACIN_LOW		#(Volt) Valor mínimo aceitável na entrada AC - Ver datasheet
+
+TIME_LOW		#(Centisegundo) Valor mínimo aceitável do tempo restante em modo de bateria
 
 
-O script faz duas comparações, caso as duas condições forem verdadeiras, o host inicia o desligamento.
+Definindo as variáveis:
 
-Condições para desligamento:
+ACIN_LOW:
 
-TIME for inferior a 30 Minutos.
+Recomendo que seja consultado o datasheet do Nobreak, o SMX3000LV informa que o menor valor aceitável na entrada AC é 70 volts.
 
-ACIN for inferior a 50 Volts.
+SMX3000LV - ACIN_LOW=70
+
+
+TIME_LOW:
+
+TIME_LOW = [ TEMPO_DESLIGAMENTO x FS x 6000 ]
+
+TEMPO_DESLIGAMENTO = Tempo em que o servidor ou VM leva para desligar. (Em minutos)
+
+FS = Fator de segurança, precisa ser igual ou maior que 1.1 (FS => 1.1)
+
+6000 = Conversão do tempo para centisegundo
+
+
+Exemplo de TIME_LOW:
+
+Considerando que o tempo médio para desligamento do servidor seja de 10 minutos com um fator de segurança de 20%:
+
+TIME_LOW = [ 10 x 1.2 x 6000 ] 
+
+TIME_LOW = 72000 centisegundos
+
+
+Exemplo de configuração no CRON para execução a cada 5 minutos.
+
+*/5 * * * * usuario /opt/SNMPshutdown/SNMPshutdown.sh
