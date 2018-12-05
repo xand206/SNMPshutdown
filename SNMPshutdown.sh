@@ -23,6 +23,6 @@ then
                 shutdown -h +5
         fi
 else
-        echo "Erro de leitura SNMP"
+        echo "Erro de leitura SNMP" >> $LOG
 fi
 #FIM
